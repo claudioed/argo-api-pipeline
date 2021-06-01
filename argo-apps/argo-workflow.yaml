@@ -8,14 +8,13 @@ metadata:
 spec:
   project: api-pipeline
   source:
-    path: manifests/quickstart/minimal
-    repoURL: https://github.com/argoproj/argo-workflows.git
+    path: charts/argo-workflows
+    repoURL: https://github.com/argoproj/argo-helm.git
     targetRevision: HEAD
   destination:
+    namespace: kube-system
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:
       selfHeal: true
       prune: true
-    syncOptions:
-      - CreateNamespace=true
