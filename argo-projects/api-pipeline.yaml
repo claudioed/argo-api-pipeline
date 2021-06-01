@@ -9,7 +9,6 @@ spec:
   description: Production project
   sourceRepos:
     - '*'
-    - https://kubernetes-charts.storage.googleapis.com
   destinations:
     - namespace: '*'
       server: https://kubernetes.default.svc
