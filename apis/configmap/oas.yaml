@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oas
+data:
+  players-v1.yaml:  |
+        openapi: 3.0.0
+        info:
+            title: Bets - Players API
+            version: 2.0.0
+            contact:
+                name: Apirator Dev Team
+                email: apirator@apirator.io
+            license:
+                name: MIT License
+                url: 'https://opensource.org/licenses/MIT'
+        paths:
+            '/api/players/{id}':
+                description: Find players data
+                get:
+                    tags:
+                        - players
+                    parameters:
+                        -
+                            name: id
+                            description: Player ID
+                            schema:
+                                type: string
+                            in: path
+                            required: true
+                    responses:
+                        '200':
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/player'
+                                    examples:
+                                        joe:
+                                            value:
+                                                name: Joe Doe
+                                                email: joe@doe.com
+                            description: |
+                                When player was found
+                        '404':
+                            content:
+                                application/json:
+                                    examples:
+                                        error:
+                                            value:
+                                                code: 404
+                                                message: not found
+                            description: 404 response
+                    operationId: get-player-by-id
+                    summary: Get Player Details
+        components:
+            schemas:
+                player:
+                    title: Root Type for player
+                    description: Player data
+                    type: object
+                    properties:
+                        name:
+                            type: string
+                        email:
+                            type: string
+                    example:
+                        name: Joe Doe
+                        email: joe@doe.com
+  players-v2.yaml: |
+      openapi: 3.0.0
+      info:
+          title: Bets - Players API
+          version: 2.0.0
+          contact:
+              name: Apirator Dev Team
+              email: apirator@apirator.io
+          license:
+              name: MIT License
+              url: 'https://opensource.org/licenses/MIT'
+      paths:
+          '/api/players/{id}':
+              description: Find players data
+              get:
+                  tags:
+                      - players
+                  parameters:
+                      -
+                          name: id
+                          description: Player ID
+                          schema:
+                              type: string
+                          in: path
+                          required: true
+                  responses:
+                      '200':
+                          content:
+                              application/json:
+                                  schema:
+                                      $ref: '#/components/schemas/player'
+                                  examples:
+                                      player:
+                                          value:
+                                              username: joe
+                                              email: joe@doe.com
+                          description: |
+                              When player was found
+                      '404':
+                          content:
+                              application/json:
+                                  examples:
+                                      error:
+                                          value:
+                                              code: 404
+                                              message: not found
+                          description: 404 response
+                  operationId: get-player-by-id
+                  summary: Get Player Details
+      components:
+          schemas:
+              player:
+                  title: Root Type for player
+                  description: Player Data
+                  type: object
+                  properties:
+                      username:
+                          type: string
+                      email:
+                          type: string
+                  example:
+                      username: joe
+                      email: joe@doe.com

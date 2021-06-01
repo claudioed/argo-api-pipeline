@@ -1,0 +1,97 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: full-api
+spec:
+  volumes:
+    - name: oas
+      configMap:
+        name: oas
+        items:
+          - key: players-v1.yaml
+            path: /apis
+          - key: players-v2.yaml
+            path: /apis
+  entrypoint: openapiflow
+
+  templates:
+    - steps:
+        - - template: checkapi
+            arguments:
+              parameters:
+                - name: location
+                  value: "/apis/players-v1.yaml"
+                - name: error_on
+                  value: error
+                  ## error, warn,info and hint
+            name: validate
+
+        - - template: checkbackwardcompatibility
+            arguments:
+              parameters:
+                - name: new_api_location
+                  value: "/apis/players-v2.yaml"
+                - name: old_api_location
+                  value: "/apis/players-v1.yaml"
+                - name: args
+                  value: --state
+                  ## --state, --fail-on-incompatible
+            name: backward
+
+        - - template: openapidoc
+            arguments:
+              parameters:
+                - name: new_api_location
+                  value: "/apis/players-v2.yaml"
+            name: documentation
+      name: openapiflow
+
+    - name: openapidoc
+      volumes:
+        - name: oas
+          configMap:
+            name: oas
+      inputs:
+        parameters:
+          - name: new_api_location
+      container:
+        volumeMounts:
+          - name: oas
+            mountPath: /apis
+        image: shesse/redoc-cli
+        command: [ redoc-cli ]
+        args: ["{{inputs.parameters.new_api_location}}"]
+
+    - name: checkbackwardcompatibility
+      volumes:
+        - name: oas
+          configMap:
+            name: oas
+      inputs:
+        parameters:
+          - name: new_api_location
+          - name: old_api_location
+          - name: args
+      container:
+        volumeMounts:
+          - name: oas
+            mountPath: /apis
+        image: openapitools/openapi-diff:latest
+        args: ["{{inputs.parameters.old_api_location}}","{{inputs.parameters.new_api_location}}", "{{inputs.parameters.args}}"]
+
+    - name: checkapi
+      volumes:
+        - name: oas
+          configMap:
+            name: oas
+      inputs:
+        parameters:
+          - name: location
+          - name: error_on
+      container:
+        volumeMounts:
+          - name: oas
+            mountPath: /apis
+        image: stoplight/spectral
+        command: [ spectral, lint ]
+        args: ["{{inputs.parameters.location}}","--fail-severity={{inputs.parameters.error_on}}"]

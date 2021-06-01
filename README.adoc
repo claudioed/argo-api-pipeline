@@ -1,0 +1,39 @@
+= Open API Diff
+Doc Writer <claudioed.oliveira@gmail.com>
+:reproducible:
+:listing-caption: Listing
+:source-highlighter: rouge
+:toc:
+// Uncomment next line to add a title page (or set doctype to book)
+//:title-page:
+// Uncomment next line to set page size (default is A4)
+//:pdf-page-size: Letter
+
+
+== Requirements
+* Docker
+* Two Open API files
+
+== Intro
+Simple repo to test open api diff provided by OpenAPI Tools
+
+== Running
+
+Check the API compatibility
+
+Run on root folder
+
+[source,sh]
+docker run --rm -t -v $(pwd)/apis:/apis openapitools/openapi-diff:latest /apis/players-v1.yaml /apis/players-v2.yaml
+
+Check the API compatibility and produce result
+
+using tag **--fail-on-incompatible**
+
+[source,sh]
+docker run --rm -t -v $(pwd)/apis:/apis openapitools/openapi-diff:latest /apis/players-v1.yaml /apis/players-v2.yaml --fail-on-incompatible
+
+== Create configmap from file
+
+[source,shell script]
+kubectl create configmap oas --from-file=/home/claudioed/development/open-api-diff/apis/players-v1.yaml -n argo
